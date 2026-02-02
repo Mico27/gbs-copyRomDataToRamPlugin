@@ -1,0 +1,11 @@
+{
+  "_resourceType": "tileset",
+  "id": "5c41abe8-cda0-4c64-8b23-47963d9a4f8f",
+  "name": "Saul/010",
+  "symbol": "tileset_saul_010",
+  "width": 18,
+  "height": 14,
+  "imageWidth": 144,
+  "imageHeight": 112,
+  "filename": "Saul/010.png"
+}

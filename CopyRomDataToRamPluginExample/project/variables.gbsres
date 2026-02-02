@@ -1,0 +1,31 @@
+{
+  "_resourceType": "variables",
+  "variables": [
+    {
+      "id": "0",
+      "name": "Frame_counter",
+      "symbol": "var_frame_counter"
+    },
+    {
+      "id": "1",
+      "name": "Tileset_pointer",
+      "symbol": "var_tileset_pointer"
+    },
+    {
+      "id": "2",
+      "name": "Tileset_bank",
+      "symbol": "var_tileset_bank"
+    },
+    {
+      "id": "3",
+      "name": "Scene_bank",
+      "symbol": "var_scene_bank"
+    },
+    {
+      "id": "4",
+      "name": "Scene_pointer",
+      "symbol": "var_scene_pointer"
+    }
+  ],
+  "constants": []
+}

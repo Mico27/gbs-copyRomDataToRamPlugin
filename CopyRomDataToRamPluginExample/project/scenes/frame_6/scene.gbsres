@@ -1,0 +1,26 @@
+{
+  "_resourceType": "scene",
+  "id": "3e3b8fe4-3780-480d-b1f2-1c206406f301",
+  "_index": 7,
+  "name": "Frame 6",
+  "backgroundId": "b40bfe61-3d89-4eeb-ab46-fb485d4744c7",
+  "tilesetId": "",
+  "width": 18,
+  "height": 14,
+  "type": "TOPDOWN",
+  "colorModeOverride": "none",
+  "paletteIds": [
+    "01de077b-1f49-4914-be5a-d76bf15ab6d6",
+    "340ad281-bcc3-41bb-97fc-37b6e2a03c3b"
+  ],
+  "spritePaletteIds": [],
+  "collisions": "00fc+",
+  "autoFadeSpeed": 1,
+  "symbol": "scene_8",
+  "x": 816,
+  "y": 416,
+  "script": [],
+  "playerHit1Script": [],
+  "playerHit2Script": [],
+  "playerHit3Script": []
+}

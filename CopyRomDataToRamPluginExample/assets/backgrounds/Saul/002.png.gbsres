@@ -1,0 +1,12 @@
+{
+  "_resourceType": "background",
+  "id": "2942b02a-43b5-4235-a658-02640f6eb0ea",
+  "name": "Saul/002",
+  "symbol": "bg_saul_002",
+  "tileColors": "0119+003+01e+005+01d+005+01d+005+01d+005+01d+005+01d+005+01d+005+01d+005+01e+004+01e+005+01d+003+01f+003+018+",
+  "filename": "Saul/002.png",
+  "width": 18,
+  "height": 14,
+  "imageWidth": 144,
+  "imageHeight": 112
+}
