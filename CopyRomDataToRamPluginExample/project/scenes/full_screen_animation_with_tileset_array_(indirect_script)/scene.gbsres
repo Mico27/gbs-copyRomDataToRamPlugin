@@ -1,8 +1,8 @@
 {
   "_resourceType": "scene",
-  "id": "36270058-444f-4088-87fe-b71501eadcc7",
-  "_index": 0,
-  "name": "Full screen animation with Tileset array",
+  "id": "b90e65f8-ab79-47fe-b1cd-c5b087abee90",
+  "_index": 12,
+  "name": "Full screen animation with Tileset array (Indirect script)",
   "backgroundId": "2c8f0810-c393-447e-9ed7-38709a2aff2f",
   "tilesetId": "aeba64e4-999f-4ad6-8630-79111b5c76e1",
   "width": 40,
@@ -13,8 +13,8 @@
   "spritePaletteIds": [],
   "collisions": "002d0+",
   "autoFadeSpeed": null,
-  "symbol": "scene_1",
-  "x": 96,
+  "symbol": "scene_13",
+  "x": 472,
   "y": 56,
   "script": [
     {
@@ -4118,10 +4118,9 @@
         "tilesetId_4094": "152b6696-6fa1-4f7d-8644-ea4bef164d0c",
         "tilesetId_4095": "152b6696-6fa1-4f7d-8644-ea4bef164d0c",
         "__collapse": true,
-        "rom_data_symbol": "saul_tilesets",
-        "__comment": false
+        "rom_data_symbol": "saul_tilesets"
       },
-      "id": "940e4b65-95f6-46da-a25a-54c06316909c"
+      "id": "b1177ff5-993f-42fb-937a-403035e127ee"
     },
     {
       "command": "EVENT_MUSIC_PLAY",
@@ -4129,7 +4128,7 @@
         "musicId": "fabfda38-3f7a-4a79-b17d-2eaf80339648",
         "__collapse": true
       },
-      "id": "630ad2f3-9c83-4519-93b6-f08017478adf"
+      "id": "8e4efdf4-d876-4e9f-953e-88016fb249b5"
     },
     {
       "command": "EVENT_GROUP",
@@ -4145,7 +4144,7 @@
               "actorId": "$self$",
               "__collapse": true
             },
-            "id": "b1f8493c-2ace-4bb5-98b9-5e924467cef9"
+            "id": "105d6c36-fe20-4701-a250-f2b2968e4427"
           },
           {
             "command": "EVENT_CAMERA_SET_POSITION",
@@ -4160,7 +4159,7 @@
               },
               "__collapse": true
             },
-            "id": "68e9d4ae-4da2-4062-af4e-283401badf8d"
+            "id": "04719597-b646-47e5-b065-2f0df0298f3c"
           },
           {
             "command": "EVENT_COPY_BKG_SUBMAP_TO_WIN",
@@ -4200,7 +4199,7 @@
               },
               "__collapse": true
             },
-            "id": "8f6e8075-8971-4b56-804c-ee22fa6b60df"
+            "id": "2f9ba8a1-4b6c-4113-8901-edcad8f32d4c"
           },
           {
             "command": "EVENT_REPLACE_TILESET_TILES",
@@ -4217,7 +4216,7 @@
               "tile_length": 252,
               "__collapse": true
             },
-            "id": "831fa788-88c0-4ace-9e92-a85c90a5c6fc"
+            "id": "03bce449-92c2-441c-854c-8f05ee1e0239"
           },
           {
             "command": "EVENT_GBVM_SCRIPT",
@@ -4225,7 +4224,7 @@
               "script": "VM_OVERLAY_SETPOS 0, 18",
               "__collapse": true
             },
-            "id": "06f99f89-3ca7-4542-8fd2-09cced023ce7"
+            "id": "1f5fcb48-e456-4422-becc-7dc5a97f219b"
           },
           {
             "command": "EVENT_SET_VALUE",
@@ -4237,11 +4236,11 @@
               },
               "__collapse": true
             },
-            "id": "ef7462e9-6205-4d7b-8da1-119c0621bfd8"
+            "id": "d0532abb-130f-4b2c-b4d8-227905415a72"
           }
         ]
       },
-      "id": "56117ce9-5aa8-4e3c-9043-e2b513afed29"
+      "id": "5427c823-00c4-4214-ae0d-7e5877727c32"
     },
     {
       "command": "EVENT_FADE_IN",
@@ -4249,14 +4248,14 @@
         "speed": "2",
         "__collapse": true
       },
-      "id": "93b2e8f4-2e1e-41b1-bd72-8ac241fc9359"
+      "id": "c076eff1-31d9-48c5-8b40-08ec684171fc"
     },
     {
       "command": "EVENT_SCRIPT_UNLOCK",
       "args": {
         "__collapse": true
       },
-      "id": "8e537f41-cddf-4828-b6fc-721fa30e5179"
+      "id": "341940aa-ceef-4ed6-bff5-31f98be8a1e5"
     },
     {
       "command": "EVENT_THREAD_START",
@@ -4268,290 +4267,27 @@
       "children": {
         "true": [
           {
-            "command": "EVENT_LOOP",
-            "args": {},
-            "children": {
-              "true": [
-                {
-                  "command": "EVENT_GROUP",
-                  "args": {
-                    "__collapse": false,
-                    "__label": "DrawFrameOverlay - Frame 1",
-                    "__comment": false
-                  },
-                  "children": {
-                    "true": [
-                      {
-                        "command": "EVENT_COPY_ROM_DATA_TO_RAM",
-                        "args": {
-                          "rom_data_offset": {
-                            "type": "variable",
-                            "value": "0"
-                          },
-                          "ram_data_offset": {
-                            "type": "number",
-                            "value": 0
-                          },
-                          "data_length": {
-                            "type": "number",
-                            "value": 1
-                          },
-                          "rom_data_symbol": "saul_tilesets",
-                          "ram_data_ptr": "2"
-                        },
-                        "id": "cb787320-da40-4c4a-9c1e-f6370b0cb0e3"
-                      },
-                      {
-                        "command": "EVENT_INC_VALUE",
-                        "args": {
-                          "variable": "0"
-                        },
-                        "id": "3768eb01-af21-42d0-b671-25b229e58d00"
-                      },
-                      {
-                        "command": "EVENT_COPY_ROM_DATA_TO_RAM",
-                        "args": {
-                          "rom_data_offset": {
-                            "type": "variable",
-                            "value": "0"
-                          },
-                          "ram_data_offset": {
-                            "type": "number",
-                            "value": 0
-                          },
-                          "data_length": {
-                            "type": "number",
-                            "value": 2
-                          },
-                          "rom_data_symbol": "saul_tilesets",
-                          "ram_data_ptr": "1"
-                        },
-                        "id": "400d182a-5a8c-4c94-9df0-01329ef8ab18"
-                      },
-                      {
-                        "command": "EVENT_SET_VALUE",
-                        "args": {
-                          "variable": "0",
-                          "value": {
-                            "type": "expression",
-                            "value": "$00$ + 2"
-                          }
-                        },
-                        "id": "fe368801-eaf6-43a3-9d7a-c4dddf4d652a"
-                      },
-                      {
-                        "command": "EVENT_IDLE",
-                        "args": {
-                          "__collapse": true
-                        },
-                        "id": "9a15599a-75a7-4d4d-8bf3-90cef51519c6"
-                      },
-                      {
-                        "command": "EVENT_REPLACE_TILESET_TILES_EX",
-                        "args": {
-                          "tileset_bank": {
-                            "type": "variable",
-                            "value": "2"
-                          },
-                          "tileset_ptr": {
-                            "type": "variable",
-                            "value": "1"
-                          },
-                          "idx_target_tile": {
-                            "type": "number",
-                            "value": 2048
-                          },
-                          "idx_start_tile": {
-                            "type": "number",
-                            "value": 0
-                          },
-                          "tile_length": {
-                            "type": "number",
-                            "value": 252
-                          }
-                        },
-                        "id": "088337e7-243d-48f5-9592-7197aea27c16"
-                      },
-                      {
-                        "command": "EVENT_IDLE",
-                        "args": {
-                          "__collapse": true
-                        },
-                        "id": "709f7619-1424-4154-92c9-537220db95b9"
-                      },
-                      {
-                        "command": "EVENT_GBVM_SCRIPT",
-                        "args": {
-                          "script": "VM_OVERLAY_SETPOS 0, 0",
-                          "__collapse": false
-                        },
-                        "id": "16997683-eb55-4ff9-b5d5-02531eb8131b"
-                      }
-                    ]
-                  },
-                  "id": "c590d8c1-f00a-4d33-896b-2ace53060df2"
-                },
-                {
-                  "command": "EVENT_GROUP",
-                  "args": {
-                    "__collapse": true,
-                    "__label": "DrawFrameBackground - Frame 2",
-                    "__comment": false
-                  },
-                  "children": {
-                    "true": [
-                      {
-                        "command": "EVENT_COPY_ROM_DATA_TO_RAM",
-                        "args": {
-                          "rom_data_offset": {
-                            "type": "variable",
-                            "value": "0"
-                          },
-                          "ram_data_offset": {
-                            "type": "number",
-                            "value": 0
-                          },
-                          "data_length": {
-                            "type": "number",
-                            "value": 1
-                          },
-                          "rom_data_symbol": "saul_tilesets",
-                          "ram_data_ptr": "2"
-                        },
-                        "id": "f0d9de2a-113e-40ec-8cf5-6f1b96eb8fbd"
-                      },
-                      {
-                        "command": "EVENT_INC_VALUE",
-                        "args": {
-                          "variable": "0"
-                        },
-                        "id": "487bc8c4-553c-434e-8d2f-d3c86435462a"
-                      },
-                      {
-                        "command": "EVENT_COPY_ROM_DATA_TO_RAM",
-                        "args": {
-                          "rom_data_offset": {
-                            "type": "variable",
-                            "value": "0"
-                          },
-                          "ram_data_offset": {
-                            "type": "number",
-                            "value": 0
-                          },
-                          "data_length": {
-                            "type": "number",
-                            "value": 2
-                          },
-                          "rom_data_symbol": "saul_tilesets",
-                          "ram_data_ptr": "1"
-                        },
-                        "id": "21ed9151-ac98-4f0a-9861-2d6bc0167df9"
-                      },
-                      {
-                        "command": "EVENT_SET_VALUE",
-                        "args": {
-                          "variable": "0",
-                          "value": {
-                            "type": "expression",
-                            "value": "$00$ + 2"
-                          }
-                        },
-                        "id": "86229098-0b28-437b-a409-8854aedc28c9"
-                      },
-                      {
-                        "command": "EVENT_IDLE",
-                        "args": {
-                          "__collapse": true
-                        },
-                        "id": "2e9d3627-194d-4a65-9c8a-d93c7014d901"
-                      },
-                      {
-                        "command": "EVENT_REPLACE_TILESET_TILES_EX",
-                        "args": {
-                          "tileset_bank": {
-                            "type": "variable",
-                            "value": "2"
-                          },
-                          "tileset_ptr": {
-                            "type": "variable",
-                            "value": "1"
-                          },
-                          "idx_target_tile": {
-                            "type": "number",
-                            "value": 0
-                          },
-                          "idx_start_tile": {
-                            "type": "number",
-                            "value": 0
-                          },
-                          "tile_length": {
-                            "type": "number",
-                            "value": 252
-                          }
-                        },
-                        "id": "6afd0174-0b83-4fc4-8e05-ccfd5bbe0939"
-                      },
-                      {
-                        "command": "EVENT_IDLE",
-                        "args": {
-                          "__collapse": true
-                        },
-                        "id": "b91d959d-6ac0-4374-abb9-b4aef60bcdf7"
-                      },
-                      {
-                        "command": "EVENT_GBVM_SCRIPT",
-                        "args": {
-                          "script": "VM_OVERLAY_SETPOS 0, 18",
-                          "__collapse": false
-                        },
-                        "id": "739c89c2-5333-4219-89f6-d9a3782e3f49"
-                      }
-                    ]
-                  },
-                  "id": "c96d51cd-72a0-4c05-821c-3f5b522e3c2f"
-                },
-                {
-                  "command": "EVENT_IF",
-                  "args": {
-                    "condition": {
-                      "type": "gt",
-                      "valueA": {
-                        "type": "variable",
-                        "value": "0"
-                      },
-                      "valueB": {
-                        "type": "number",
-                        "value": 147
-                      }
-                    },
-                    "__collapseElse": true,
-                    "__collapse": false
-                  },
-                  "children": {
-                    "true": [
-                      {
-                        "command": "EVENT_SET_VALUE",
-                        "args": {
-                          "variable": "0",
-                          "value": {
-                            "type": "number",
-                            "value": 0
-                          }
-                        },
-                        "id": "ebdb049f-8b0a-41f6-8f94-80e2ca7ba65b"
-                      }
-                    ],
-                    "false": []
-                  },
-                  "id": "021815aa-e7e6-43b7-88d8-f198110f17e2"
-                }
-              ]
+            "command": "EVENT_CALL_CUSTOM_EVENT",
+            "args": {
+              "customEventId": "78adb4f1-5c6e-4ce2-a3de-cfd29cf25373",
+              "$variable[V0]$": {
+                "type": "variable",
+                "value": "0"
+              },
+              "$variable[V1]$": {
+                "type": "variable",
+                "value": "2"
+              },
+              "$variable[V2]$": {
+                "type": "variable",
+                "value": "1"
+              }
             },
-            "id": "f4e1579e-47e6-4eb2-87b6-b5175f3d71a4"
+            "id": "3bab5ac5-8646-4985-9890-1a2157f84660"
           }
         ]
       },
-      "id": "044f0034-a8a6-4e5d-bfaa-cd1671146abb"
+      "id": "134f3e8e-f32b-4d01-9442-09e77a6dc64d"
     }
   ],
   "playerHit1Script": [],

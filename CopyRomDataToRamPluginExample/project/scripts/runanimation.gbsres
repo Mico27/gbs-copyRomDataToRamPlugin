@@ -1,0 +1,311 @@
+{
+  "_resourceType": "script",
+  "id": "78adb4f1-5c6e-4ce2-a3de-cfd29cf25373",
+  "name": "RunAnimation",
+  "description": "",
+  "variables": {
+    "V0": {
+      "id": "V0",
+      "name": "FrameCounterParam",
+      "passByReference": true
+    },
+    "V1": {
+      "id": "V1",
+      "name": "TilesetBankParam",
+      "passByReference": true
+    },
+    "V2": {
+      "id": "V2",
+      "name": "TilesetPointerParam",
+      "passByReference": true
+    }
+  },
+  "actors": {},
+  "symbol": "script_1",
+  "script": [
+    {
+      "command": "EVENT_LOOP",
+      "args": {
+        "__collapse": false
+      },
+      "children": {
+        "true": [
+          {
+            "command": "EVENT_GROUP",
+            "args": {
+              "__collapse": false,
+              "__label": "DrawFrameOverlay - Frame 1",
+              "__comment": false
+            },
+            "children": {
+              "true": [
+                {
+                  "command": "EVENT_COPY_ROM_DATA_TO_RAM",
+                  "args": {
+                    "rom_data_offset": {
+                      "type": "variable",
+                      "value": "V0"
+                    },
+                    "ram_data_offset": {
+                      "type": "number",
+                      "value": 0
+                    },
+                    "data_length": {
+                      "type": "number",
+                      "value": 1
+                    },
+                    "rom_data_symbol": "saul_tilesets",
+                    "ram_data_ptr": "V1"
+                  },
+                  "id": "f49a4a36-4a44-46a7-8a1a-2ef3829e9b69"
+                },
+                {
+                  "command": "EVENT_INC_VALUE",
+                  "args": {
+                    "variable": "V0"
+                  },
+                  "id": "efa72a5f-f33a-4bb4-af50-7ecc46ef5a5a"
+                },
+                {
+                  "command": "EVENT_COPY_ROM_DATA_TO_RAM",
+                  "args": {
+                    "rom_data_offset": {
+                      "type": "variable",
+                      "value": "V0"
+                    },
+                    "ram_data_offset": {
+                      "type": "number",
+                      "value": 0
+                    },
+                    "data_length": {
+                      "type": "number",
+                      "value": 2
+                    },
+                    "rom_data_symbol": "saul_tilesets",
+                    "ram_data_ptr": "V2"
+                  },
+                  "id": "ddbc1a29-193b-4f2e-b6dc-e26c748f479f"
+                },
+                {
+                  "command": "EVENT_SET_VALUE",
+                  "args": {
+                    "variable": "V0",
+                    "value": {
+                      "type": "expression",
+                      "value": "$V0$ + 2"
+                    }
+                  },
+                  "id": "adab3ecf-6158-4b37-97d9-580b97f3b884"
+                },
+                {
+                  "command": "EVENT_IDLE",
+                  "args": {
+                    "__collapse": true
+                  },
+                  "id": "348b6c71-1083-46f6-97e9-f9b50f2df86d"
+                },
+                {
+                  "command": "EVENT_REPLACE_TILESET_TILES_EX",
+                  "args": {
+                    "tileset_bank": {
+                      "type": "variable",
+                      "value": "V1"
+                    },
+                    "tileset_ptr": {
+                      "type": "variable",
+                      "value": "V2"
+                    },
+                    "idx_target_tile": {
+                      "type": "number",
+                      "value": 2048
+                    },
+                    "idx_start_tile": {
+                      "type": "number",
+                      "value": 0
+                    },
+                    "tile_length": {
+                      "type": "number",
+                      "value": 252
+                    }
+                  },
+                  "id": "5992ceb3-bd37-4a0f-9c48-4cff98ef41c3"
+                },
+                {
+                  "command": "EVENT_IDLE",
+                  "args": {
+                    "__collapse": true
+                  },
+                  "id": "466a9204-36e9-4a7c-80db-a718091b522d"
+                },
+                {
+                  "command": "EVENT_GBVM_SCRIPT",
+                  "args": {
+                    "script": "VM_OVERLAY_SETPOS 0, 0",
+                    "__collapse": false
+                  },
+                  "id": "a33342de-6774-43d4-bbff-4c056be632cd"
+                }
+              ]
+            },
+            "id": "433e262f-c1cd-451b-bd7a-6f4bf409fe03"
+          },
+          {
+            "command": "EVENT_GROUP",
+            "args": {
+              "__collapse": false,
+              "__label": "DrawFrameBackground - Frame 2",
+              "__comment": false
+            },
+            "children": {
+              "true": [
+                {
+                  "command": "EVENT_COPY_ROM_DATA_TO_RAM",
+                  "args": {
+                    "rom_data_offset": {
+                      "type": "variable",
+                      "value": "V0"
+                    },
+                    "ram_data_offset": {
+                      "type": "number",
+                      "value": 0
+                    },
+                    "data_length": {
+                      "type": "number",
+                      "value": 1
+                    },
+                    "rom_data_symbol": "saul_tilesets",
+                    "ram_data_ptr": "V1"
+                  },
+                  "id": "526e76bc-d4ad-4d56-b319-b855ae76120d"
+                },
+                {
+                  "command": "EVENT_INC_VALUE",
+                  "args": {
+                    "variable": "V0"
+                  },
+                  "id": "c7c5a38a-fecf-4fc8-bbbe-3ecbb8a34727"
+                },
+                {
+                  "command": "EVENT_COPY_ROM_DATA_TO_RAM",
+                  "args": {
+                    "rom_data_offset": {
+                      "type": "variable",
+                      "value": "V0"
+                    },
+                    "ram_data_offset": {
+                      "type": "number",
+                      "value": 0
+                    },
+                    "data_length": {
+                      "type": "number",
+                      "value": 2
+                    },
+                    "rom_data_symbol": "saul_tilesets",
+                    "ram_data_ptr": "V2"
+                  },
+                  "id": "b56d04e4-eba7-4ea3-abbf-c100e843aa87"
+                },
+                {
+                  "command": "EVENT_SET_VALUE",
+                  "args": {
+                    "variable": "V0",
+                    "value": {
+                      "type": "expression",
+                      "value": "$V0$ + 2"
+                    }
+                  },
+                  "id": "8263da68-4ef7-4880-b184-780e63e4755c"
+                },
+                {
+                  "command": "EVENT_IDLE",
+                  "args": {
+                    "__collapse": true
+                  },
+                  "id": "2a8f88fb-7395-4df1-81a0-a599cd9c0c00"
+                },
+                {
+                  "command": "EVENT_REPLACE_TILESET_TILES_EX",
+                  "args": {
+                    "tileset_bank": {
+                      "type": "variable",
+                      "value": "V1"
+                    },
+                    "tileset_ptr": {
+                      "type": "variable",
+                      "value": "V2"
+                    },
+                    "idx_target_tile": {
+                      "type": "number",
+                      "value": 0
+                    },
+                    "idx_start_tile": {
+                      "type": "number",
+                      "value": 0
+                    },
+                    "tile_length": {
+                      "type": "number",
+                      "value": 252
+                    }
+                  },
+                  "id": "fc484245-f51a-458f-bb2d-60d134448a5a"
+                },
+                {
+                  "command": "EVENT_IDLE",
+                  "args": {
+                    "__collapse": true
+                  },
+                  "id": "4a5c2391-1816-4a05-8515-47ebb3c1fde3"
+                },
+                {
+                  "command": "EVENT_GBVM_SCRIPT",
+                  "args": {
+                    "script": "VM_OVERLAY_SETPOS 0, 18",
+                    "__collapse": false
+                  },
+                  "id": "27eb5093-98d2-4502-8085-e2bd77338068"
+                }
+              ]
+            },
+            "id": "66f5b9b8-7c24-4b2d-a875-8e7a5936e8a3"
+          },
+          {
+            "command": "EVENT_IF",
+            "args": {
+              "condition": {
+                "type": "gt",
+                "valueA": {
+                  "type": "variable",
+                  "value": "V0"
+                },
+                "valueB": {
+                  "type": "number",
+                  "value": 147
+                }
+              },
+              "__collapseElse": true,
+              "__collapse": false
+            },
+            "children": {
+              "true": [
+                {
+                  "command": "EVENT_SET_VALUE",
+                  "args": {
+                    "variable": "V0",
+                    "value": {
+                      "type": "number",
+                      "value": 0
+                    }
+                  },
+                  "id": "0e151925-fd39-427f-a5f1-cfbc19eee7e3"
+                }
+              ],
+              "false": []
+            },
+            "id": "7f3e9ded-ffb7-43b8-b723-c2eaf4e17af3"
+          }
+        ]
+      },
+      "id": "a574a6f5-d928-427d-9156-c5355b922feb"
+    }
+  ]
+}
