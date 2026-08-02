@@ -1,26 +1,18 @@
 # gbs-copyRomDataToRamPlugin
 
-**Version 4.3.0 — Requires GB Studio ≥ 4.3.0**
+**Version 4.3.1 — Requires GB Studio ≥ 4.3.0**
 
 A GB Studio engine plugin that provides low-level access to arbitrary ROM data from scripts. It adds three events:
 
-- **Copy ROM data to variable** — reads any number of bytes from a named ROM symbol (at a given offset) into script variables using `MemcpyBanked`.
-- **Compile tileset array** — generates a ROM asset file containing an array of tileset far pointers (bank + address), addressable by index from scripts.
-- **Compile scene array** — generates a ROM asset file containing an array of scene far pointers, addressable by index from scripts.
+- **Copy ROM data to variable** — reads any number of bytes from a named ROM symbol, at a given offset, into script variables.
+- **Compile tileset array** — generates a ROM array of tileset far pointers, addressable by index from scripts.
+- **Compile scene array** — generates a ROM array of scene far pointers, addressable by index from scripts.
 
-The array-compile events are compile-time code generators: they write `.c` / `.h` source files into the build output, producing named ROM arrays. The copy event then reads individual entries from those arrays at runtime by index.
+The two array events are build-time generators: they produce named ROM arrays. The copy event then reads individual entries from those arrays at runtime by index.
 
-> **Warning:** This plugin requires knowledge of how ROM data and far pointers work in the GB Studio / GBDK engine. Incorrect symbol names, offsets, or lengths will produce silent garbage reads or memory corruption.
+> **Warning:** This plugin requires an understanding of how ROM data and far pointers work in GB Studio. Incorrect symbol names, offsets or lengths produce silent garbage reads or memory corruption.
 
 <img width="524" height="210" alt="image" src="https://github.com/user-attachments/assets/efb3f77d-75e5-4fbf-991b-875f8b83d6e2" />
-
-<img width="589" height="497" alt="image" src="https://github.com/user-attachments/assets/7620f64a-3991-45ef-a357-3f85b32ccf7d" />
-
-<img width="550" height="854" alt="image" src="https://github.com/user-attachments/assets/5d7c013a-740d-4fb3-a57e-817df2bbe0e0" />
-
-<img width="587" height="399" alt="image" src="https://github.com/user-attachments/assets/48a0446b-6004-4b72-a1a9-cd1948b87431" />
-
-<img width="551" height="1102" alt="image" src="https://github.com/user-attachments/assets/c8514a7b-6a9a-4bad-877c-5898724cc79b" />
 
 ---
 
@@ -28,252 +20,155 @@ The array-compile events are compile-time code generators: they write `.c` / `.h
 
 1. [Concepts](#concepts)
 2. [Project Setup](#project-setup)
-3. [How to Use](#how-to-use)
-4. [Technicalities and Restrictions](#technicalities-and-restrictions)
-5. [Events Reference](#events-reference)
-6. [Inner Workings](#inner-workings)
-7. [Memory Footprint](#memory-footprint)
+3. [Size Limits and Restrictions](#size-limits-and-restrictions)
+4. [Events Reference](#events-reference)
+5. [Memory Footprint](#memory-footprint)
 
 ---
 
 ## Concepts
 
-### ROM Banks and Far Pointers
+### ROM banks and far pointers
 
-The Game Boy uses a banked ROM architecture. Only one 16 KB bank is visible at a time. To read data from an arbitrary bank, the code must store both the bank number and the pointer to the data — together called a **far pointer** (`far_ptr_t`). GB Studio's engine uses `MemcpyBanked` to read from any bank safely: it switches to the target bank, copies the requested bytes, then switches back.
+The Game Boy uses a banked ROM architecture — only one 16 KB bank is visible at a time. To reach data in an arbitrary bank you need both the bank number and the address within it. Together those two values are a **far pointer**, and they are what most GB Studio events that take "a bank and a pointer" expect.
 
-A named symbol in a ROM bank is accessible via two GBDK macros:
-- `_symbol_name` — the address of the symbol
-- `___bank_symbol_name` — the bank number where the symbol resides
+A far pointer occupies **3 bytes**: one bank byte followed by a 2-byte address. That is why reading entry *i* of a far-pointer array means reading 3 bytes at offset `i × 3`.
 
-These are the values pushed by the **Copy ROM data to variable** compile function.
+### Script variables are 2 bytes each
 
-### Script Variables and `script_memory`
+GB Studio stores script variables as consecutive 16-bit slots. **Copy ROM data to variable** copies raw bytes into those slots starting at the variable you pick, so a read longer than 2 bytes spills into the next variable, and so on.
 
-GB Studio stores all script variables in a flat array called `script_memory`. Each variable is a 16-bit (`uint16_t`) slot. The **Copy ROM data to variable** event copies raw bytes from ROM directly into consecutive slots of `script_memory` starting at the specified variable. When the data length is greater than 2 bytes, bytes overflow into the next variable slot(s).
+Reading a far pointer (3 bytes) therefore fills the first variable with the bank byte plus the low half of the address, and the low byte of the next variable with the rest — which is exactly the pair of values a far-pointer-taking event expects.
 
-### `far_ptr_t` Layout
+### Build-time array generation
 
-A `far_ptr_t` is a struct containing a bank byte and a pointer:
+**Compile tileset array** and **Compile scene array** run when the project is built, not at runtime. They generate a named ROM array of far pointers. Scripts then read from that array at runtime with **Copy ROM data to variable**, using the same symbol name.
 
-```c
-typedef struct {
-    uint8_t  bank;
-    void    *ptr;
-} far_ptr_t;
-```
-
-On the Game Boy (8-bit, 16-bit pointer), `sizeof(far_ptr_t)` is 3 bytes. Reading a `far_ptr_t` from a ROM array at index `i` therefore requires a byte offset of `i * 3` and a data length of 3.
-
-### Compile-Time Asset Generation
-
-The **Compile tileset array** and **Compile scene array** events run at **GB Studio compile time** (not at game runtime). They use the `writeAsset` compiler helper to generate `.c` and `.h` source files that are included in the engine build. The generated files declare a named array of `far_ptr_t` entries. Scripts then read from these arrays at runtime using **Copy ROM data to variable** with the matching symbol name.
+<img width="589" height="497" alt="image" src="https://github.com/user-attachments/assets/7620f64a-3991-45ef-a357-3f85b32ccf7d" />
 
 ---
 
 ## Project Setup
 
-1. Copy the plugin folder into your GB Studio project's `plugins/` directory.
-2. No additional configuration, engine fields, or compatibility variants are required.
-3. To use custom hand-written ROM data (not generated by the array events), create a `.c` file in `assets/engine/src/` or another location included in the build. Declare your data as a `const` array with `#pragma bank N` to place it in the correct bank, and use `BANKREF` so the compiler exports the bank symbol.
+1. Copy the plugin folder into your GB Studio project's `plugins/` directory. No additional configuration, engine fields, or compatibility variants are required.
 
----
+### Reading a tileset far pointer by index
 
-## How to Use
-
-### Reading a Tileset Far Pointer by Index
-
-1. Add a **Compile tileset array** event to any script (typically a scene's init script, since it runs at compile time). It only needs to exist in one script — multiple placements of the same symbol compile the same file.
+1. Add a **Compile tileset array** event to any script — a scene's init script works, since the event runs at build time. It only needs to exist in one script.
 2. Set **Custom data symbol** to a unique name, e.g. `my_tileset_list`.
 3. Set **Tileset count** and select each tileset in order.
 4. Add a **Copy ROM data to variable** event where you want to read a far pointer at runtime:
    - **Custom data symbol:** `my_tileset_list`
-   - **Custom data offset:** `index * 3` (where `index` is which tileset to select, 0-based)
-   - **Variable:** the variable to receive the bank byte (the pointer fills the next variable automatically)
+   - **Custom data offset:** `index × 3`, where `index` is the 0-based tileset to select
+   - **Variable:** the variable to receive the bank byte; the pointer fills the next variable automatically
    - **Variable offset:** `0`
    - **Data length:** `3`
-5. Pass the two variables (bank and pointer) to **Replace Tileset Tiles Ex** or any other event that accepts a far pointer.
+5. Pass the two resulting variables to **Replace Tileset Tiles Ex**, or any other event that accepts a far pointer.
 
-### Reading a Scene Far Pointer by Index
+<img width="550" height="854" alt="image" src="https://github.com/user-attachments/assets/5d7c013a-740d-4fb3-a57e-817df2bbe0e0" />
 
-Same workflow as above, but using **Compile scene array** and passing the resulting far pointer to a GBVM scene-change instruction or the SubmappingExPlugin events.
+### Reading a scene far pointer by index
 
-### Reading Custom ROM Data
+The same workflow, using **Compile scene array** and passing the far pointer to the SubmappingExPlugin events or a scene-change instruction.
 
-1. Create a C file in `assets/engine/src/` with `#pragma bank 255` and declare your data array, e.g.:
-   ```c
-   #pragma bank 255
-   #include "bankdata.h"
-   BANKREF(my_data)
-   const uint8_t my_data[] = { 10, 20, 30, 40 };
-   ```
-2. Use **Copy ROM data to variable** with **Custom data symbol** = `my_data`, offset = the index of the byte you want, data length = number of bytes to read.
+<img width="587" height="399" alt="image" src="https://github.com/user-attachments/assets/48a0446b-6004-4b72-a1a9-cd1948b87431" />
+
+### Reading your own ROM data
+
+Create a C file under `assets/engine/src/` declaring your data as a `const` array, with `#pragma bank 255` to let the linker place it and `BANKREF` so its bank symbol is exported:
+
+```c
+#pragma bank 255
+#include "bankdata.h"
+BANKREF(my_data)
+const uint8_t my_data[] = { 10, 20, 30, 40 };
+```
+
+Then use **Copy ROM data to variable** with **Custom data symbol** = `my_data`, the offset of the byte you want, and the number of bytes to read.
+
+<img width="551" height="1102" alt="image" src="https://github.com/user-attachments/assets/c8514a7b-6a9a-4bad-877c-5898724cc79b" />
 
 ---
 
-## Technicalities and Restrictions
+## Size Limits and Restrictions
 
-### Data Length Is in Bytes, Not Variables
+### Data length is in bytes, not variables
 
-The **Data length** field is a byte count. Because each GB Studio variable is 2 bytes wide (`uint16_t`), a length of `1` reads 1 byte into the low byte of the destination variable; a length of `2` fills one full variable; a length of `3` fills one variable and the low byte of the next; and so on. Plan your variable layout accordingly.
+Each GB Studio variable is 2 bytes wide. A length of 1 reads one byte into the low half of the destination variable; 2 fills one whole variable; 3 fills one variable and the low byte of the next; and so on. Plan your variable layout accordingly.
 
-### `far_ptr_t` Is 3 Bytes
+### A far pointer is 3 bytes
 
-On the Game Boy target, `sizeof(far_ptr_t)` is 3 bytes (1 bank byte + 2-byte pointer). To read one far pointer from an array, use offset = `index * 3` and length = `3`. The bank byte lands in the low byte of the first variable; the pointer spans the high byte of the first variable and the low byte of the second.
+To read one far pointer from an array, use offset `index × 3` and length `3`.
 
-### Variable Offset for Multi-Variable Reads
+### Variable offset
 
-The **Variable offset** field adds an additional slot offset to the destination: the write starts at `script_memory[variable_alias + ram_data_offset]`. This allows writing into the middle of a multi-variable buffer without declaring additional locals.
+**Variable offset** adds an extra slot offset to the destination, so you can write into the middle of a multi-variable buffer without declaring more locals. Use 0 for most cases.
 
-### The Symbol Must Exist in the Build
+### The symbol must exist in the build
 
-If the **Custom data symbol** does not resolve to a real symbol in the compiled ROM, the build will fail with a linker error. For array events, the symbol is generated automatically during compilation. For hand-written data, the file and `BANKREF` declaration must be present before building.
+If **Custom data symbol** doesn't resolve to a real symbol in the compiled ROM, the build fails with a link error. For the array events the symbol is generated for you; for hand-written data the file and its `BANKREF` declaration must be present before building.
 
-### Array Events Are Compile-Time Only
+### The array events are build-time only
 
-**Compile tileset array** and **Compile scene array** do not produce any GBVM bytecode. They emit source files during the GB Studio build step. Changing the array contents requires a full rebuild of the project. The events must be placed in at least one script for the compiler to process them.
+They produce no runtime code. Changing an array's contents requires a full rebuild, and each event must appear in at least one script for the build to process it.
 
-### No Bounds Checking
+### No bounds checking
 
-`MemcpyBanked` copies exactly as many bytes as requested. Reading past the end of a ROM symbol, using a wrong bank number, or misaligning the offset will silently read adjacent ROM data. Always verify your offsets and lengths.
+Exactly as many bytes as you request are copied. Reading past the end of a symbol, or misaligning the offset, silently reads adjacent ROM data. Verify your offsets and lengths.
 
-### No Engine Files Modified
+### No engine files modified
 
-This plugin only adds a new engine source file (`copy_rom_data_to_ram.c`). No existing GB Studio engine files are patched.
+The plugin only adds a new engine source file, so it has no compatibility conflicts with other engine plugins.
 
 ---
 
 ## Events Reference
 
-### Copy ROM Data to Variable
+---
 
-**Event ID:** `EVENT_COPY_ROM_DATA_TO_RAM`  
-**Groups:** Variables, Misc
+### Copy ROM data to variable
 
-Copies a sequence of bytes from a named ROM symbol (at a given byte offset) into consecutive script variable slots starting at the specified variable (with an optional variable-slot offset). All parameters except the symbol name are runtime value expressions.
+**`EVENT_COPY_ROM_DATA_TO_RAM`** — groups: **Variables**, **Misc**
 
-| Field | Type | Default | Description |
-|---|---|---|---|
-| Custom data symbol | Text | — | The C symbol name of the ROM data to read from (e.g. `my_tileset_list`). Resolved at compile time to the address and bank of the symbol. |
-| Custom data offset | Value expression | 0 | Byte offset into the ROM data array at which to begin reading. For `far_ptr_t` arrays use `index * 3`. |
-| Variable | Variable picker | — | The first script variable to write into. Receives byte 0 of the read. |
-| Variable offset | Value expression | 0 | Additional variable-slot offset applied to the destination (added to the variable's alias index). Use 0 for most cases. |
-| Data length (byte) | Value expression | 0 | Number of bytes to copy. 1–2 fills one variable; 3–4 fills two; and so on. |
+Copies a sequence of bytes from a named ROM symbol, at a given byte offset, into consecutive script variable slots. All parameters except the symbol name accept values, variables or expressions.
 
-**Notes:**
-- Data length of 0 copies nothing.
-- Each variable slot is 2 bytes. Lengths > 2 write into subsequent variable slots.
+| Field | Default | Description |
+|---|---|---|
+| Custom data symbol | — | The symbol name of the ROM data to read from, e.g. `my_tileset_list`. |
+| Custom data offset | 0 | Byte offset into the ROM data at which to begin reading. For far-pointer arrays use `index × 3`. |
+| Variable | — | The first script variable to write into; it receives the first byte of the read. |
+| Variable offset | 0 | Additional variable-slot offset applied to the destination. Use 0 for most cases. |
+| Data length (byte) | 0 | Number of bytes to copy. 0 copies nothing; 1–2 fills one variable; 3–4 fills two; and so on. |
 
 ---
 
-### Compile Tileset Array
+### Compile tileset array
 
-**Event ID:** `EVENT_COMPILE_TILESET_ARRAY`  
-**Groups:** Scene → Tiles
+**`EVENT_COMPILE_TILESET_ARRAY`** — group: **Scene → Tiles**
 
-Generates a `.c` / `.h` ROM asset file containing a `const far_ptr_t[]` array of tileset far pointers. The event runs at compile time and produces no runtime bytecode.
+Generates a ROM array of tileset far pointers. Runs at build time and produces no runtime code.
 
-| Field | Type | Default | Description |
-|---|---|---|---|
-| Custom data symbol | Text | — | Name of the generated C symbol and file (e.g. `my_tileset_list`). Must be a valid C identifier. |
-| Tileset count | Number | 1 | Number of tilesets in the array (1–4096). |
-| Tileset 1 … N | Tileset picker | Last tileset | Each tileset entry in the array. Index 0 = first entry, index N-1 = last. |
+| Field | Default | Description |
+|---|---|---|
+| Custom data symbol | — | Name of the generated symbol, e.g. `my_tileset_list`. Must be a valid C identifier. |
+| Tileset count | 1 | Number of tilesets in the array (1–4096). |
+| Tileset 1 … N | Last tileset | Each tileset entry, in order. Index 0 is the first entry. |
 
-**Notes:**
-- The generated symbol can be read by **Copy ROM data to variable** with `offset = index * 3`, `length = 3`.
-- The event only needs to appear once in any script; duplicates with the same symbol name regenerate the same file.
+Read an entry with **Copy ROM data to variable** using offset `index × 3` and length `3`. The event only needs to appear once in any script; duplicates with the same symbol name regenerate the same array.
 
 ---
 
-### Compile Scene Array
+### Compile scene array
 
-**Event ID:** `EVENT_COMPILE_SCENE_ARRAY`  
-**Groups:** Scene → Tiles
+**`EVENT_COMPILE_SCENE_ARRAY`** — group: **Scene → Tiles**
 
-Generates a `.c` / `.h` ROM asset file containing a `const far_ptr_t[]` array of scene far pointers. Used to look up scenes by index at runtime for dynamic scene changes or submapping.
+Generates a ROM array of scene far pointers, for looking scenes up by index at runtime — for dynamic scene changes or submapping.
 
-| Field | Type | Default | Description |
-|---|---|---|---|
-| Custom data symbol | Text | — | Name of the generated C symbol and file. |
-| Scene count | Number | 1 | Number of scenes in the array (1–4096). |
-| Scene 1 … N | Scene picker | Last scene | Each scene entry in the array. |
-
-**Notes:**
-- The generated symbol can be passed to SubmappingExPlugin events or GBVM scene-change instructions after reading the bank and pointer with **Copy ROM data to variable**.
-
----
-
-## Inner Workings
-
-### `copy_rom_data_to_ram` Native Function
-
-```c
-void copy_rom_data_to_ram(SCRIPT_CTX * THIS) OLDCALL BANKED {
-    uint8_t   rom_data_bank   = *(uint8_t *) VM_REF_TO_PTR(FN_ARG0);
-    uint8_t*  rom_data_ptr    = *(uint8_t**)  VM_REF_TO_PTR(FN_ARG1);
-    uint16_t  rom_data_offset = *(int16_t*)  VM_REF_TO_PTR(FN_ARG2);
-    uint16_t* ram_data_ptr    = &script_memory[*(int16_t*) VM_REF_TO_PTR(FN_ARG3)];
-    uint16_t  ram_data_offset = *(int16_t*)  VM_REF_TO_PTR(FN_ARG4);
-    size_t    data_length     = *(size_t*)   VM_REF_TO_PTR(FN_ARG5);
-    MemcpyBanked(
-        ram_data_ptr + ram_data_offset,
-        rom_data_ptr + rom_data_offset,
-        data_length,
-        rom_data_bank
-    );
-}
-```
-
-- `rom_data_bank` and `rom_data_ptr` are the far pointer components of the target symbol — the bank is passed via `___bank_symbol` and the address via `_symbol`.
-- `rom_data_offset` is added to the pointer as a **byte offset** (since the pointer is `uint8_t *`).
-- `ram_data_ptr` is resolved to a `uint16_t *` pointing into `script_memory` at the variable's alias index. `ram_data_offset` is then added as a **variable-slot offset** (each slot = 2 bytes, since the pointer is `uint16_t *`).
-- `MemcpyBanked` switches the ROM bank to `rom_data_bank`, copies `data_length` bytes from the source address to the destination, then restores the previous bank.
-
-### JS Stack Argument Order
-
-The compile function pushes arguments in this order (first pushed = deepest in stack = highest `FN_ARG` number):
-
-```js
-_stackPush(tmp2);                         // FN_ARG5: data_length
-_stackPush(tmp1);                         // FN_ARG4: ram_data_offset
-_stackPushConst(variableAlias);           // FN_ARG3: destination variable index
-_stackPush(tmp0);                         // FN_ARG2: rom_data_offset
-_stackPushConst(`_${rom_data_symbol}`);   // FN_ARG1: ROM address of symbol
-_stackPushConst(`___bank_${rom_data_symbol}`); // FN_ARG0: ROM bank of symbol
-```
-
-### Generated Asset Format (Tileset Array Example)
-
-**`my_tileset_list.c`:**
-```c
-#pragma bank 255
-
-#include "data/my_tileset_list.h"
-#include "bankdata.h"
-#include "data/tileset_forest.h"
-#include "data/tileset_cave.h"
-
-BANKREF(my_tileset_list)
-
-const far_ptr_t my_tileset_list[] = {
-    TO_FAR_PTR_T(tileset_forest),
-    TO_FAR_PTR_T(tileset_cave),
-};
-```
-
-`TO_FAR_PTR_T(symbol)` expands to `{ ___bank_symbol, (void*)&symbol }`, producing a 3-byte `far_ptr_t` entry for each tileset. The `#pragma bank 255` places the array in the last available bank (auto-assigned by the linker). `BANKREF` exports the `___bank_my_tileset_list` symbol so the array itself can be passed as a far pointer.
-
-### Reading an Entry by Index
-
-To read entry `i` from the array:
-
-- **Custom data offset** = `i * 3` (each `far_ptr_t` is 3 bytes: 1 bank byte + 2 pointer bytes)
-- **Data length** = `3`
-- The bank byte is written to the low byte of **Variable** (slot `variable_alias + ram_data_offset`)
-- The 2-byte pointer is written across the high byte of that slot and the low byte of the next slot
-
-The resulting two 16-bit variable values can then be passed directly to events that accept a `(bank, pointer)` far pointer pair, such as **Replace Tileset Tiles Ex** or **Submap from scene**.
-
+| Field | Default | Description |
+|---|---|---|
+| Custom data symbol | — | Name of the generated symbol. Must be a valid C identifier. |
+| Scene count | 1 | Number of scenes in the array (1–4096). |
+| Scene 1 … N | Last scene | Each scene entry, in order. |
 
 ---
 
@@ -286,7 +181,8 @@ Measured against the stock GB Studio **4.3.0-e1** engine (per-file SDCC compile 
 | WRAM | +0 bytes |
 | ROM | +218 bytes |
 
-- **WRAM:** no fixed cost — the copy destination is whatever RAM address you point the event at, so any WRAM/SRAM it fills is memory you have explicitly set aside yourself.
+- **WRAM:** no fixed cost — the copy destination is whatever variables you point the event at, so any memory it fills is memory you have already set aside.
+- **ROM:** the figure above is the plugin's code only. Each array you generate with the Compile events adds 3 bytes per entry on top.
 - **Engine WRAM headroom:** the stock GB Studio 4.3.0 engine leaves about **854 bytes** of WRAM free (usable engine WRAM is 7,776 bytes at 0xC0A0–0xDF00; the stock engine uses 6,922 bytes). With this plugin installed roughly **854 bytes** remain. This figure does not depend on how many global variables your project defines: the script memory array has a fixed size of VM_HEAP_SIZE + (VM_MAX_CONTEXTS × VM_CONTEXT_STACK_SIZE) words — 768 + 16 × 64 = 1,792 words (3,584 bytes) with stock engine settings.
 - **SRAM:** not used.
 
