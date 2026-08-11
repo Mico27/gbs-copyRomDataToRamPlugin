@@ -20,14 +20,16 @@ void set_xy_win_submap(const UBYTE * source, UBYTE bank, UBYTE width, UBYTE x, U
 #endif
 
 // ---------------------------------------------------------------------------
+// engineAlt variant for ScreenScrollPlugin / ContinuousScenePlugin.
 // Absolute scene tile coordinate -> background VRAM tilemap cell (0-31).
-// The engineAlt variants for ScreenScrollPlugin / ContinuousScenePlugin
-// redefine these two macros to add bkg_offset_x/bkg_offset_y; that is the ONLY
-// difference between this file and those variants, so keep every background
-// VRAM write going through them. Overlay/window cells are never offset.
+// Those plugins shift the background tilemap in VRAM by (bkg_offset_x,
+// bkg_offset_y) (declared extern in their scroll.h), so the offset is added
+// here before the & 31 wrap. This pair of macros is the ONLY difference
+// between this file and the base engine/src/copy_scene_parts.c.
+// Overlay/window cells and ROM tilemap reads are unchanged.
 // ---------------------------------------------------------------------------
-#define BKG_VRAM_X(x) ((UBYTE)(x) & 31)
-#define BKG_VRAM_Y(y) ((UBYTE)(y) & 31)
+#define BKG_VRAM_X(x) ((UBYTE)((x) + bkg_offset_x) & 31)
+#define BKG_VRAM_Y(y) ((UBYTE)((y) + bkg_offset_y) & 31)
 
 // ---------------------------------------------------------------------------
 // Screen-relative coordinates ("take scrolling into account").
